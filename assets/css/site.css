@@ -82,17 +82,7 @@ button, input, textarea { font: inherit; color: inherit; }
 .hero-itens li { display: inline-flex; align-items: center; gap: 8px; }
 .hero-itens .ic { width: 18px; height: 18px; color: var(--pet); }
 .globo { position: relative; margin: 0; width: 100%; max-width: 480px; aspect-ratio: 1; justify-self: center; }
-.globo img, .globo .rotas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.rotas { overflow: visible; font: 600 13px var(--texto); }
-.rota { fill: none; stroke: var(--pet); stroke-width: 1.6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
-.destino circle { fill: #fff; stroke: var(--pet); stroke-width: 2; }
-.destino text, .origem text { fill: var(--tinta); paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
-.origem circle { fill: var(--pet); }
-.origem .halo { fill: var(--azul); opacity: .3; }
-/* as rotas se desenham uma vez, devagar */
-.js .rota { stroke-dashoffset: 1; animation: traca 1.6s var(--ease) forwards; animation-delay: calc(.5s + var(--i) * .35s); }
-.js .destino { opacity: 0; animation: surge .5s ease forwards; animation-delay: calc(1.7s + var(--i) * .35s); }
-@keyframes traca { to { stroke-dashoffset: 0; } }
+.globo img, .globo canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 @keyframes surge { to { opacity: 1; } }
 
 /* números */
@@ -256,8 +246,58 @@ a.contato:hover { border-color: var(--pet); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js .rv { opacity: 1; transform: none; transition: none; }
-  .js .rota { animation: none; stroke-dashoffset: 0; }
-  .js .destino { animation: none; opacity: 1; }
   .js .painel:not([hidden]) { animation: none; }
   .etapa .n, .faq summary .ic, .zap-fixo { transition: none; }
 }
+
+/* globo que gira */
+.globo-bloco { display: grid; gap: 10px; justify-items: center; width: 100%; }
+.globo-leg { display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 15px; color: var(--tinta-2); min-height: 36px; }
+.globo-leg[hidden] { display: none; }
+.globo-leg b { color: var(--tinta); font-weight: 600; }
+#globo-dest { display: inline-block; min-width: 9ch; }
+#globo-pausa { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 12px; border: 1px solid var(--linha); border-radius: var(--r); background: #fff; color: var(--tinta-2); font-size: 14px; cursor: pointer; }
+#globo-pausa:hover { border-color: var(--pet); color: var(--pet); }
+#globo-pausa .ic { width: 14px; height: 14px; }
+
+/* selo de autorizada (só texto, sem o logo da FedEx) */
+.selo-fedex { display: inline-flex; align-items: center; gap: 12px; justify-self: start; margin-top: 6px; padding: 10px 16px 10px 12px; border: 1px solid var(--pet); border-radius: var(--r); background: #fff; color: var(--tinta); text-decoration: none; }
+.selo-fedex .ic { width: 30px; height: 30px; color: var(--pet); }
+.selo-fedex span { display: grid; line-height: 1.25; }
+.selo-fedex b { font-family: var(--titulo); font-weight: 650; font-size: 16px; color: var(--pet); letter-spacing: .01em; text-transform: uppercase; }
+.selo-fedex small { font-size: 14px; color: var(--tinta-2); }
+.selo-fedex:hover { background: var(--pet-claro); }
+
+/* seção autorizada FedEx */
+.fedex-cards { display: grid; gap: 16px; }
+@media (min-width: 860px) { .fedex-cards { grid-template-columns: repeat(3, 1fr); } }
+.fdx { display: grid; gap: 10px; align-content: start; padding: 26px; border: 1px solid var(--linha); border-radius: var(--r-g); background: #fff; }
+.fdx:first-child { border-color: var(--pet); box-shadow: inset 0 3px 0 var(--pet); }
+.fdx > .ic { width: 26px; height: 26px; color: var(--pet); }
+.fdx-selo { display: inline-flex; align-items: center; gap: 8px; justify-self: start; padding: 4px 10px; border-radius: var(--r); background: var(--pet); color: #fff; font-family: var(--titulo); font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.fdx-selo .ic { width: 16px; height: 16px; }
+.fdx h3 { font-size: 19px; }
+.fdx p { color: var(--tinta-2); }
+.cab p b { color: var(--tinta); }
+
+/* você x a LCM faz por você */
+.divisao { display: grid; gap: 16px; margin-bottom: 48px; }
+@media (min-width: 900px) { .divisao { grid-template-columns: 1fr 2fr; gap: 24px; } }
+.div-voce, .div-lcm { padding: 28px; border-radius: var(--r-g); }
+.div-voce { border: 1px solid var(--linha); background: #fff; display: grid; gap: 14px; align-content: start; }
+.div-voce h3, .div-lcm h3 { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; }
+.div-voce h3 { color: var(--tinta-3); }
+.voce-lista { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 18px; }
+.div-nota { font-family: var(--titulo); font-weight: 600; color: var(--pet); }
+.div-lcm { background: var(--noite); color: var(--sobre-noite); }
+.div-lcm h3 { color: var(--azul); margin-bottom: 16px; }
+.faz { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+@media (min-width: 640px) { .faz { grid-template-columns: 1fr 1fr; gap: 16px 28px; } }
+.faz li { display: flex; gap: 12px; align-items: flex-start; }
+.faz .ic { width: 22px; height: 22px; flex: none; margin-top: 1px; padding: 3px; border-radius: 50%; background: var(--pet); color: #fff; }
+.faz b { color: #fff; font-weight: 600; }
+
+/* campo do conteúdo: aparece em encomenda e carga (sem JS, fica sempre visível) */
+.campo.conteudo { margin-top: 16px; }
+.js .cot-form[data-tipo="Documentos"] .campo.conteudo { display: none; }
+@media (prefers-reduced-motion: reduce) { .selo-fedex, #globo-pausa { transition: none; } }

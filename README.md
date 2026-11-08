@@ -15,12 +15,13 @@ Nada é carregado de fora. As fontes, o logo e o globo ficam dentro do próprio 
 ├── robots.txt, sitemap.xml  para os buscadores
 ├── assets/
 │   ├── css/site.css         visual: cores, fontes, layout e animações
-│   ├── js/site.js           menu, abas, etapas, contadores e cotação
+│   ├── js/site.js           menu, abas, etapas, contadores, cotação e o globo que gira
+│   ├── js/globo-dados.js    pontos dos continentes do globo (gerado por ferramentas/gerar-globo.py)
 │   ├── fonts/               Archivo e Source Sans 3 (licença OFL, arquivos .txt ao lado)
 │   └── img/                 logo, favicon, globo e imagem de compartilhamento
 └── ferramentas/             só para manutenção: NÃO enviar para a hospedagem
     ├── teste-site.js        teste automático (Playwright)
-    ├── gerar-globo.py       gera o globo e as rotas do topo
+    ├── gerar-globo.py       gera os pontos do globo e a imagem parada (usada sem JavaScript)
     └── land-110m.json       mapa-múndi usado pelo globo (Natural Earth, domínio público)
 ```
 
@@ -49,19 +50,27 @@ Nada é carregado de fora. As fontes, o logo e o globo ficam dentro do próprio 
 
 **Depoimentos:** a seção foi retirada de propósito. Ela só deve voltar com depoimentos reais e com autorização dos clientes.
 
-## 4. Como funciona a cotação
+## 4. Autorizada FedEx
 
-O cliente preenche o tipo de envio, o destino, o peso e as medidas e os seus dados. O site calcula o **peso cubado** (comprimento × largura × altura em cm ÷ 5.000, por volume) e mostra o **peso considerado**, que é o maior entre o real e o cubado.
+O site apresenta a LCM como **autorizada FedEx** em vários pontos: no selo do topo, na seção "Autorizada FedEx", no menu e no rodapé.
+- **O selo é só em texto**, sem o logo da FedEx. A arte oficial só é fornecida pela própria FedEx. Se um dia a LCM receber o selo oficial, ele pode substituir o selo em texto (classe `selo-fedex` no `index.html`).
+- **No rodapé** fica o aviso de marca: "FedEx é marca registrada da Federal Express Corporation".
+
+**Destinos do globo:** a lista `DEST` em `assets/js/site.js` (nome, longitude e latitude).
+
+## 5. Como funciona a cotação
+
+O cliente preenche o tipo de envio, o destino, o peso e as medidas e os seus dados. São **obrigatórios**: país, **cidade** (o frete pode mudar conforme a cidade), nome e, para encomenda/amostra e carga, **o que vai ser enviado**. O site calcula o **peso cubado** (comprimento × largura × altura em cm ÷ 5.000, por volume) e mostra o **peso considerado**, que é o maior entre o real e o cubado.
 
 - O divisor 5.000 foi conferido em 8/11/2026 nas páginas oficiais da DHL Express e no guia "Como embalar" da FedEx Brasil.
 - O site **não mostra preço**.
 - Ao enviar, abre o WhatsApp da LCM com a mensagem pronta. Também há um link para mandar os mesmos dados por e-mail.
 
-## 5. Dúvidas frequentes: de onde vêm as informações
+## 6. Dúvidas frequentes: de onde vêm as informações
 
 A resposta sobre a declaração de exportação (DRE até US$ 1.000; DU-E acima disso ou com licença, registrada pelo courier) segue o Manual de Remessas da Receita Federal, página "Declaração Aduaneira", atualizada em 01/08/2024. Revise se a regra mudar.
 
-## 6. Testar
+## 7. Testar
 
 ```
 npx serve -l 8793 .

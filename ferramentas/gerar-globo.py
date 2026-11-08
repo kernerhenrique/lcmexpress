@@ -1,4 +1,4 @@
-"""Gera o globo do topo: assets/img/globo.svg (continentes em pontos) e assets/img/rotas.svg.txt (rotas, para colar no index.html).
+"""Gera o globo do topo: assets/img/globo.svg (imagem parada, usada sem JavaScript) e assets/js/globo-dados.js (pontos do globo que gira).
 Mapa: world-atlas 2 (land-110m.json, Natural Earth, domínio público). Uso: python3 ferramentas/gerar-globo.py"""
 import json, math, pathlib
 
@@ -65,33 +65,16 @@ svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520">'
        f'<g fill="#085D87" fill-opacity=".55">{"".join(pontos)}</g></svg>')
 (RAIZ / 'assets/img/globo.svg').write_text(svg)
 
-# rotas a partir de Vitória (grande círculo, levantado do chão)
-VIX = (-40.29, -20.32)
-DESTINOS = [('Miami', -80.19, 25.76), ('Londres', -0.13, 51.51), ('Joanesburgo', 28.05, -26.2), ('Santiago', -70.67, -33.45)]
-def xyz(lon, lat):
-    l, f = math.radians(lon), math.radians(lat)
-    return (math.cos(f) * math.cos(l), math.cos(f) * math.sin(l), math.sin(f))
-def ll(v):
-    x, y, z = v; return math.degrees(math.atan2(y, x)), math.degrees(math.asin(max(-1, min(1, z))))
-def caminho(a, b, alto=0.22, n=48):
-    A, B = xyz(*a), xyz(*b)
-    w = math.acos(max(-1, min(1, sum(p * q for p, q in zip(A, B)))))
-    out = []
-    for k in range(n + 1):
-        t = k / n
-        s1, s2 = math.sin((1 - t) * w) / math.sin(w), math.sin(t * w) / math.sin(w)
-        v = tuple(s1 * p + s2 * q for p, q in zip(A, B))
-        lon, lat = ll(v)
-        x, y, _ = proj(lon, lat, 1 + alto * math.sin(math.pi * t) * min(1, w / 1.2))
-        out.append(f'{x:.1f},{y:.1f}')
-    return 'M' + ' L'.join(out)
-
-vx, vy, _ = proj(*VIX)
-partes = []
-for i, (nome, lon, lat) in enumerate(DESTINOS):
-    x, y, _ = proj(lon, lat)
-    partes.append(f'<path class="rota" style="--i:{i}" pathLength="1" d="{caminho(VIX, (lon, lat))}"/>')
-    partes.append(f'<g class="destino" style="--i:{i}"><circle cx="{x:.1f}" cy="{y:.1f}" r="3.2"/><text x="{(x - 7) if x > 400 else (x + 7):.1f}" y="{y - 6:.1f}"{' text-anchor="end"' if x > 400 else ''}>{nome}</text></g>')
-partes.append(f'<g class="origem"><circle class="halo" cx="{vx:.1f}" cy="{vy:.1f}" r="9"/><circle cx="{vx:.1f}" cy="{vy:.1f}" r="4.2"/><text x="{vx + 9:.1f}" y="{vy + 16:.1f}">Vitória</text></g>')
-(AQUI / 'rotas.svg.txt').write_text('\n'.join(partes))   # cole este conteúdo no index.html, dentro de <svg class="rotas">
-print(len(pontos), 'pontos; globo.svg', len(svg) // 1024, 'KB')
+# pontos de terra do mundo inteiro, para o globo que gira (desenhado no navegador por assets/js/site.js)
+todos = []
+lat = -88.0
+while lat <= 88:
+    dl = passo / max(math.cos(math.radians(lat)), 0.15)
+    lon = -180.0
+    while lon < 180:
+        if terra(lon, lat): todos += [round(lon * 10), round(lat * 10)]
+        lon += dl
+    lat += passo
+js = '/* Gerado por ferramentas/gerar-globo.py: pontos de terra (longitude e latitude x 10), Natural Earth 1:110m. */\nwindow.LCM_TERRA=[' + ','.join(map(str, todos)) + '];\n'
+(RAIZ / 'assets/js/globo-dados.js').write_text(js)
+print(len(pontos), 'pontos no globo.svg (', len(svg) // 1024, 'KB ); globo-dados.js:', len(todos) // 2, 'pontos,', len(js) // 1024, 'KB')

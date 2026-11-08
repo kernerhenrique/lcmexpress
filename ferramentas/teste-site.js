@@ -16,7 +16,18 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHA ') + m); if (!c) falha
 
   ok((await p.title()).includes('LCM Express'), 'título da página');
   ok(await p.locator('h1').count() === 1, 'um único h1');
-  ok(await p.locator('.rota').count() === 4, 'globo com 4 rotas');
+  // autorizada FedEx
+  ok(await p.isVisible('.selo-fedex') && (await p.innerText('.selo-fedex')).toUpperCase().includes('AUTORIZADA FEDEX'), 'selo de autorizada FedEx no topo');
+  ok(await p.locator('#fedex h2').count() === 1 && (await p.innerText('.rod-copy')).includes('marca registrada da Federal Express'), 'seção FedEx e aviso de marca no rodapé');
+  ok(await p.locator('img[src*="fedex" i], img[alt*="fedex" i]').count() === 0, 'sem logo da FedEx (só texto)');
+  // globo gira e troca de destino
+  ok(await p.isVisible('#globo') && await p.isVisible('#globo-pausa'), 'globo em canvas com botão Pausar');
+  const d1 = await p.textContent('#globo-dest'); await p.waitForTimeout(8500); const d2 = await p.textContent('#globo-dest');
+  ok(d1 !== d2, 'globo troca de destino sozinho (' + d1 + ' → ' + d2 + ')');
+  await p.click('#globo-pausa'); const d3 = await p.textContent('#globo-dest'); const px1 = await p.locator('#globo').screenshot(); await p.waitForTimeout(1500); const px2 = await p.locator('#globo').screenshot();
+  ok(px1.equals(px2) && (await p.getAttribute('#globo-pausa', 'aria-pressed')) === 'true', 'Pausar congela o globo');
+  await p.click('#globo-pausa');
+  ok((await p.innerText('#proc-titulo')).includes('A LCM cuida de todo o resto') && await p.locator('.faz li').count() === 6, 'seção "a LCM cuida de tudo" com 6 itens');
   ok(await p.locator('#depoimentos, .depoimentos').count() === 0, 'sem depoimentos');
 
   // abas dos serviços (clique e teclado)
@@ -37,20 +48,25 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHA ') + m); if (!c) falha
   ok(await p.locator('#paises option').count() > 190, 'lista com mais de 190 países (' + await p.locator('#paises option').count() + ')');
   ok(await p.locator('#paises option[value="Brasil"]').count() === 0, 'Brasil fora da lista de destinos');
   await p.click('#cotacao button[type=submit]');
-  ok(await p.locator('.campo.invalido').count() === 2, 'sem país e nome: 2 avisos de campo obrigatório');
+  ok(await p.locator('.campo.invalido').count() === 3, 'documentos sem país, cidade e nome: 3 avisos');
+  ok(await p.isHidden('#c-cont'), 'campo do conteúdo escondido em Documentos');
   await p.check('input[name=tipo][value="Encomenda ou amostra"]', { force: true });
-  await p.fill('#c-pais', 'Portugal'); await p.fill('#c-cidade', 'Lisboa');
+  ok(await p.isVisible('#c-cont'), 'campo do conteúdo aparece em Encomenda');
+  await p.fill('#c-pais', 'Portugal'); await p.fill('#c-nome', 'Ana Teste');
+  await p.click('#cotacao button[type=submit]');
+  ok(await p.locator('.campo.invalido').count() === 2 && await p.evaluate(() => document.activeElement.id === 'c-cont'), 'encomenda sem conteúdo e sem cidade: 2 avisos, foco no conteúdo');
+  await p.fill('#c-cont', 'Amostras de granito'); await p.fill('#c-cidade', 'Lisboa');
   await p.fill('#c-qtd', '2'); await p.fill('#c-peso', '3'); await p.fill('#c-c', '50'); await p.fill('#c-l', '40'); await p.fill('#c-a', '30');
   ok((await p.innerText('#r-cub')) === '24,0 kg', 'peso cubado: 2 × (50×40×30 ÷ 5.000) = 24 kg (' + await p.innerText('#r-cub') + ')');
   ok((await p.innerText('#r-real')) === '6,00 kg', 'peso real: 2 × 3 = 6 kg');
   ok((await p.innerText('#r-cons')) === '24,0 kg', 'peso considerado é o maior (24 kg)');
   ok((await p.innerText('#r-dest')) === 'Lisboa, Portugal', 'destino no resumo');
-  await p.fill('#c-nome', 'Ana Teste'); await p.fill('#c-emp', 'Empresa X');
+  await p.fill('#c-emp', 'Empresa X');
   let url = '';
   await ctx.route('https://wa.me/**', r => { url = decodeURIComponent(r.request().url()); r.fulfill({ body: 'ok', contentType: 'text/plain' }); });
   const [pop] = await Promise.all([ctx.waitForEvent('page'), p.click('#cotacao button[type=submit]')]);
   await pop.waitForLoadState(); await pop.close();
-  ok(url.includes('5527999610409') && url.includes('Portugal') && url.includes('24,0 kg') && url.includes('Ana Teste'), 'WhatsApp abre com os dados da cotação');
+  ok(url.includes('5527999610409') && url.includes('Portugal') && url.includes('24,0 kg') && url.includes('Ana Teste') && url.includes('Conteúdo:* Amostras de granito'), 'WhatsApp abre com os dados da cotação, incluindo o conteúdo');
   ok(decodeURIComponent(await p.getAttribute('#cot-mail', 'href')).includes('Lisboa, Portugal'), 'link de e-mail leva os mesmos dados');
 
   // dúvidas
@@ -75,7 +91,7 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHA ') + m); if (!c) falha
   // movimento reduzido e sem JS
   const r = await b.newPage({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
   await r.goto(BASE + '/'); await r.waitForTimeout(200);
-  ok(await r.locator('.rota').first().evaluate(e => getComputedStyle(e).strokeDashoffset) === '0px' || await r.locator('.rota').first().evaluate(e => getComputedStyle(e).strokeDashoffset === '0'), 'movimento reduzido: rotas já desenhadas');
+  ok(await r.isHidden('.globo-leg') && await r.isVisible('#globo'), 'movimento reduzido: globo parado, sem legenda nem pausa');
   ok(await r.locator('#contato .rv').first().evaluate(e => getComputedStyle(e).opacity) === '1', 'movimento reduzido: blocos visíveis');
   const sj = await b.newContext({ javaScriptEnabled: false }); const s = await sj.newPage();
   await s.goto(BASE + '/');
