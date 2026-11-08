@@ -16,8 +16,8 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHA ') + m); if (!c) falha
 
   ok((await p.title()).includes('LCM Express'), 'título da página');
   ok(await p.locator('h1').count() === 1, 'um único h1');
-  // autorizada FedEx
-  ok(await p.isVisible('.selo-fedex') && (await p.innerText('.selo-fedex')).toUpperCase().includes('AUTORIZADA FEDEX'), 'selo de autorizada FedEx no topo');
+  // centro autorizado FedEx
+  ok(await p.isVisible('.selo-fedex') && (await p.innerText('.selo-fedex')).toUpperCase().includes('CENTRO AUTORIZADO FEDEX'), 'selo de centro autorizado FedEx no topo');
   ok(await p.locator('#fedex h2').count() === 1 && (await p.innerText('.rod-copy')).includes('marca registrada da Federal Express'), 'seção FedEx e aviso de marca no rodapé');
   ok(await p.locator('img[src*="fedex" i], img[alt*="fedex" i]').count() === 0, 'sem logo da FedEx (só texto)');
   // globo gira e troca de destino

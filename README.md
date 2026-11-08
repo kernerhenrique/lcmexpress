@@ -50,9 +50,9 @@ Nada é carregado de fora. As fontes, o logo e o globo ficam dentro do próprio 
 
 **Depoimentos:** a seção foi retirada de propósito. Ela só deve voltar com depoimentos reais e com autorização dos clientes.
 
-## 4. Autorizada FedEx
+## 4. Centro autorizado FedEx
 
-O site apresenta a LCM como **autorizada FedEx** em vários pontos: no selo do topo, na seção "Autorizada FedEx", no menu e no rodapé.
+O site apresenta a LCM como **centro autorizado FedEx** em vários pontos: no selo do topo, na seção "Centro autorizado FedEx", no menu e no rodapé.
 - **O selo é só em texto**, sem o logo da FedEx. A arte oficial só é fornecida pela própria FedEx. Se um dia a LCM receber o selo oficial, ele pode substituir o selo em texto (classe `selo-fedex` no `index.html`).
 - **No rodapé** fica o aviso de marca: "FedEx é marca registrada da Federal Express Corporation".
 
