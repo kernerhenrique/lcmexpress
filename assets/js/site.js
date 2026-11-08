@@ -173,18 +173,25 @@
         if (p[2] > 0.06) { var r = (1.05 + .75 * p[2]) * esc; ctx.moveTo(p[0] + r, p[1]); ctx.arc(p[0], p[1], r, 0, 6.2832); }
       }
       ctx.fill();
-      var lista = todas ? rotas.map(function (_, i) { return i; }) : [rotaIdx];
+      // as rotas já feitas ficam na tela até o ciclo recomeçar; só a atual leva o nome do destino
+      var lista = todas ? rotas.map(function (_, i) { return i; }) : rotas.slice(0, rotaIdx + 1).map(function (_, i) { return i; });
+      // as rotas ficam dentro do contorno do globo (as já feitas, vistas de lado, não saem para fora)
+      ctx.save(); ctx.beginPath(); ctx.arc(C, C, R + 1, 0, 7); ctx.clip();
+      var nomes = [];
       lista.forEach(function (i) {
-        var pts = rotas[i], fim = todas ? 1 : prog, n = Math.floor(fim * (pts.length - 1));
+        var atual = !todas && i === rotaIdx, pts = rotas[i], fim = atual ? prog : 1, n = Math.floor(fim * (pts.length - 1));
         ctx.globalAlpha = todas ? 1 : alfa; ctx.strokeStyle = COR; ctx.lineWidth = 1.8; ctx.lineCap = 'round'; ctx.beginPath();
         var ab = false;
         for (var j = 0; j <= n; j++) {
-          var v = pts[j][0], q = proj(v[0], v[1], v[2], pts[j][1]), vis = proj(v[0], v[1], v[2], 1)[2] > -0.02;
+          var v = pts[j][0], q = proj(v[0], v[1], v[2], pts[j][1]), vis = proj(v[0], v[1], v[2], 1)[2] > 0.02;
           if (vis) { if (ab) ctx.lineTo(q[0], q[1]); else { ctx.moveTo(q[0], q[1]); ab = true; } } else ab = false;
         }
         ctx.stroke(); ctx.globalAlpha = 1;
-        if (fim >= 1) ponto(alvos[i], 3.4, COR, DEST[i][0], todas ? 1 : alfa, 9);
+        if (fim >= 1) nomes.push(i);
       });
+      ctx.restore();
+      // pontos e nomes depois do recorte, para o nome não ser cortado na borda
+      nomes.forEach(function (i) { var atual = !todas && i === rotaIdx; ponto(alvos[i], atual || todas ? 3.4 : 2.8, COR, atual || todas ? DEST[i][0] : '', todas ? 1 : alfa, 9); });
       // Vitória
       var o = proj(vVix[0], vVix[1], vVix[2], 1);
       if (o[2] > 0.05) {
@@ -196,18 +203,18 @@
     }
     var ease = function (x) { return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
     var leg = $('.globo-leg'), nomeDest = $('#globo-dest'), btn = $('#globo-pausa');
-    var GIRA = 1300, TRACA = 1000, MOSTRA = 1200, SOME = 350, CICLO = GIRA + TRACA + MOSTRA + SOME;
+    var GIRA = 1000, TRACA = 800, MOSTRA = 800, SOME = 450;
     var idx = 0, t0 = 0, pausado = false, visivel = true, raf = 0, de = null, quadroAtual = { i: 0, prog: 1, alfa: 1 };
     medida();
     if (reduz) { centro(slerp(vVix, v3([-20, 15]), .5)); desenha(0, 1, 1, true); addEventListener('resize', function () { medida(); desenha(0, 1, 1, true); }); return; }
     leg.hidden = false;
     function quadro(agora) {
-      var e = agora - t0, i = idx, a = alvos[i], prog = 0, alfa = 1, cenV;
+      var e = agora - t0, i = idx, prog = 0, alfa = 1, cenV, ultimo = i === alvos.length - 1, CICLO = GIRA + TRACA + MOSTRA + (ultimo ? SOME : 0);
       var inicio = vista(i, .3), fim = vista(i, .55);
       if (e < GIRA) { cenV = slerp(de, inicio, ease(e / GIRA)); }
       else if (e < GIRA + TRACA) { var u = (e - GIRA) / TRACA; prog = ease(u); cenV = slerp(inicio, fim, ease(u)); if (nomeDest.textContent !== DEST[i][0]) nomeDest.textContent = DEST[i][0]; }
       else if (e < GIRA + TRACA + MOSTRA) { prog = 1; cenV = fim; }
-      else if (e < CICLO) { prog = 1; alfa = 1 - (e - GIRA - TRACA - MOSTRA) / SOME; cenV = fim; }
+      else if (e < CICLO) { prog = 1; alfa = 1 - (e - GIRA - TRACA - MOSTRA) / SOME; cenV = fim; }   // só depois do último destino: todas as rotas somem juntas
       else { de = fim; idx = (idx + 1) % alvos.length; t0 = agora; raf = requestAnimationFrame(quadro); return; }
       centro(cenV); desenha(i, prog, alfa); quadroAtual = { i: i, prog: prog, alfa: alfa, cen: cenV };
       raf = requestAnimationFrame(quadro);
