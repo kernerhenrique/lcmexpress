@@ -196,7 +196,7 @@
     }
     var ease = function (x) { return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
     var leg = $('.globo-leg'), nomeDest = $('#globo-dest'), btn = $('#globo-pausa');
-    var GIRA = 2000, TRACA = 1400, MOSTRA = 1700, SOME = 500, CICLO = GIRA + TRACA + MOSTRA + SOME;
+    var GIRA = 1300, TRACA = 1000, MOSTRA = 1200, SOME = 350, CICLO = GIRA + TRACA + MOSTRA + SOME;
     var idx = 0, t0 = 0, pausado = false, visivel = true, raf = 0, de = null, quadroAtual = { i: 0, prog: 1, alfa: 1 };
     medida();
     if (reduz) { centro(slerp(vVix, v3([-20, 15]), .5)); desenha(0, 1, 1, true); addEventListener('resize', function () { medida(); desenha(0, 1, 1, true); }); return; }
