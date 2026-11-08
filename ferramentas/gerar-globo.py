@@ -93,5 +93,5 @@ for i, (nome, lon, lat) in enumerate(DESTINOS):
     partes.append(f'<path class="rota" style="--i:{i}" pathLength="1" d="{caminho(VIX, (lon, lat))}"/>')
     partes.append(f'<g class="destino" style="--i:{i}"><circle cx="{x:.1f}" cy="{y:.1f}" r="3.2"/><text x="{(x - 7) if x > 400 else (x + 7):.1f}" y="{y - 6:.1f}"{' text-anchor="end"' if x > 400 else ''}>{nome}</text></g>')
 partes.append(f'<g class="origem"><circle class="halo" cx="{vx:.1f}" cy="{vy:.1f}" r="9"/><circle cx="{vx:.1f}" cy="{vy:.1f}" r="4.2"/><text x="{vx + 9:.1f}" y="{vy + 16:.1f}">Vitória</text></g>')
-(AQUI / 'rotas.svg.txt').write_text('\n'.join(partes))
+(AQUI / 'rotas.svg.txt').write_text('\n'.join(partes))   # cole este conteúdo no index.html, dentro de <svg class="rotas">
 print(len(pontos), 'pontos; globo.svg', len(svg) // 1024, 'KB')
