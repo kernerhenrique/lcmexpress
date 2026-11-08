@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.lcmexpressvix.com.br/sitemap.xml
+Sitemap: https://lcmexpressvix.com.br/sitemap.xml
