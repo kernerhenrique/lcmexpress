@@ -221,7 +221,8 @@
     }
     var pausaEm = 0;
     function para() { if (raf) { cancelAnimationFrame(raf); raf = 0; pausaEm = performance.now(); } }
-    function segue() { if (raf || pausado || !visivel || document.hidden) return; t0 += pausaEm ? performance.now() - pausaEm : 0; pausaEm = 0; raf = requestAnimationFrame(quadro); }
+    var pronto = false;
+    function segue() { if (!pronto || raf || pausado || !visivel || document.hidden) return; t0 += pausaEm ? performance.now() - pausaEm : 0; pausaEm = 0; raf = requestAnimationFrame(quadro); }
     btn.addEventListener('click', function () {
       pausado = !pausado; btn.setAttribute('aria-pressed', String(pausado));
       btn.querySelector('use').setAttribute('href', pausado ? '#i-play' : '#i-pausa'); btn.querySelector('span').textContent = pausado ? 'Continuar' : 'Pausar';
@@ -231,7 +232,7 @@
     document.addEventListener('visibilitychange', function () { if (document.hidden) para(); else segue(); });
     addEventListener('resize', function () { medida(); if (quadroAtual.cen) { centro(quadroAtual.cen); desenha(quadroAtual.i, quadroAtual.prog, quadroAtual.alfa); } });
     de = vista(0, .3); centro(de); desenha(0, 0, 1);
-    var comeca = function () { t0 = performance.now(); raf = 0; segue(); };
+    var comeca = function () { if (pronto) return; pronto = true; t0 = performance.now(); pausaEm = 0; segue(); };   // começa uma vez só, depois das fontes
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(comeca); else comeca();
   })();
 
