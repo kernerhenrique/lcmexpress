@@ -27,7 +27,7 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHA ') + m); if (!c) falha
   await p.click('#globo-pausa'); const d3 = await p.textContent('#globo-dest'); const px1 = await p.locator('#globo').screenshot(); await p.waitForTimeout(1500); const px2 = await p.locator('#globo').screenshot();
   ok(px1.equals(px2) && (await p.getAttribute('#globo-pausa', 'aria-pressed')) === 'true', 'Pausar congela o globo');
   await p.click('#globo-pausa');
-  ok((await p.innerText('#proc-titulo')).includes('A LCM cuida de todo o resto') && await p.locator('.faz li').count() === 6, 'seção "a LCM cuida de tudo" com 6 itens');
+  ok((await p.innerText('#proc-titulo')).includes('a LCM Express cuidará de todo o processo') && await p.locator('.faz li').count() === 6, 'seção "a LCM Express cuida de tudo" com 6 itens');
   ok(await p.locator('#depoimentos, .depoimentos').count() === 0, 'sem depoimentos');
 
   // abas dos serviços (clique e teclado)
@@ -38,7 +38,12 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHA ') + m); if (!c) falha
 
   // números contam até o valor
   await p.locator('.numeros').scrollIntoViewIfNeeded(); await p.waitForTimeout(1500);
-  ok((await p.locator('[data-ate="10000"]').innerText()) === '10.000', 'contador de envios termina em 10.000');
+  ok((await p.locator('[data-ate="200000"]').innerText()) === '200.000', 'contador de envios termina em 200.000');
+  ok((await p.innerText('.marca')).replace(/\s+/g, ' ').trim().toUpperCase() === 'EXPRESS DESDE 1997', 'cabeçalho: logo + Express, com Desde 1997 embaixo');
+  ok(!(await p.innerText('.hero .sobre-tit')).toLowerCase().includes('1997'), '"desde 1997" separado do selo FedEx na abertura');
+  ok(!/nacionais e internacionais|todo o Brasil/i.test(await p.innerText('#fedex .fdx')), 'serviço FedEx só internacional');
+  ok(!/\bLCM\b(?! express)/i.test(await p.innerText('main')), 'sempre "LCM Express" nos textos');
+  ok((await p.innerText('.painel:not([hidden]) .painel-cols > div:first-child h4')).toLowerCase().includes('você separa'), 'colunas invertidas: primeiro "Você separa"');
 
   // etapas acendem com a rolagem
   await p.locator('#etapas').scrollIntoViewIfNeeded(); await p.evaluate(() => scrollBy(0, 300)); await p.waitForTimeout(300);
