@@ -1,7 +1,7 @@
 /* LCM Express · comportamento do site (sem dependências). */
 (function () {
   'use strict';
-  var WHATSAPP = '5527999610409';   // número da LCM, só dígitos, com DDI 55
+  var WHATSAPP = '552733276610';   // número da LCM, só dígitos, com DDI 55
   var EMAIL = 'lcmvix@lcmexpressvix.com.br';
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };

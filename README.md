@@ -42,7 +42,7 @@ Nada é carregado de fora. As fontes, o logo e o globo ficam dentro do próprio 
 | O que | Onde |
 | --- | --- |
 | Textos de cada seção | `index.html`, procurando o comentário da seção (`INÍCIO`, `SERVIÇOS`, `COTAÇÃO`…) |
-| WhatsApp | procure `5527999610409` no `index.html`, no `404.html` e em `assets/js/site.js` (`WHATSAPP`) |
+| WhatsApp | procure `552733276610` no `index.html`, no `404.html` e em `assets/js/site.js` (`WHATSAPP`) |
 | E-mail | procure `lcmvix@lcmexpressvix.com.br` no `index.html` e em `assets/js/site.js` (`EMAIL`) |
 | Endereço e horário | seção `CONTATO` e o bloco `application/ld+json` no topo do `index.html` |
 | Números (clientes, envios, países) | seção `NÚMEROS`, atributo `data-ate` e o texto ao lado |

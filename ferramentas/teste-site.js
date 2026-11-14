@@ -71,7 +71,7 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHA ') + m); if (!c) falha
   await ctx.route('https://wa.me/**', r => { url = decodeURIComponent(r.request().url()); r.fulfill({ body: 'ok', contentType: 'text/plain' }); });
   const [pop] = await Promise.all([ctx.waitForEvent('page'), p.click('#cotacao button[type=submit]')]);
   await pop.waitForLoadState(); await pop.close();
-  ok(url.includes('5527999610409') && url.includes('Portugal') && url.includes('24,0 kg') && url.includes('Ana Teste') && url.includes('Conteúdo:* Amostras de granito'), 'WhatsApp abre com os dados da cotação, incluindo o conteúdo');
+  ok(url.includes('552733276610') && url.includes('Portugal') && url.includes('24,0 kg') && url.includes('Ana Teste') && url.includes('Conteúdo:* Amostras de granito'), 'WhatsApp abre com os dados da cotação, incluindo o conteúdo');
   ok(decodeURIComponent(await p.getAttribute('#cot-mail', 'href')).includes('Lisboa, Portugal'), 'link de e-mail leva os mesmos dados');
 
   // dúvidas
